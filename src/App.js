@@ -6,6 +6,7 @@ It contains the top-level state.
 ==================================================*/
 import React, {Component} from 'react';
 import {BrowserRouter as Router, Route} from 'react-router-dom';
+import axios from 'axios';
 
 // Import other components
 import Home from './components/Home';
@@ -34,6 +35,43 @@ class App extends Component {
     newUser.userName = logInInfo.userName;
     this.setState({currentUser: newUser})
   }
+
+  async componentDidMount() {
+    let creditAPI = 'https://johnnylaicode.github.io/api/credits.json';  // Link to remote website API endpoint
+    let debitAPI = 'https://johnnylaicode.github.io/api/debits.json'
+
+    // Await for promise (completion) returned from API call
+    try {  // Accept success response as array of JSON objects (users)
+      let credit = await axios.get(creditAPI);
+      let debit = await axios.get(debitAPI);
+      //console.log(response);  // Print out response
+      // To get data object in the response, need to use "response.data"
+      console.log(credit.data)
+      console.log(debit.data)
+
+      credit = credit.data;
+      debit = debit.data;
+
+      let creditAmount = 0
+      let debitAmount = 0;
+      for(let i = 0; i < credit.length; i++){
+        creditAmount += credit[i].amount;
+      }
+      for(let i = 0; i < debit.length; i++){
+        debitAmount += debit[i].amount;
+      }
+      let balance = 0;
+      balance = Math.round((creditAmount - debitAmount) * 100) / 100;
+      this.setState({accountBalance: balance, creditList: credit, debitList: debit});  // Store received data in state's "users" object
+    } 
+    catch (error) {  // Print out errors at console when there is an error response
+      if (error.response) {
+        // The request was made, and the server responded with error message and status code.
+        console.log(error.response.data);  // Print out error message (e.g., Not Found)
+        console.log(error.response.status);  // Print out error status code (e.g., 404)
+      }    
+    }
+  }  
 
   // Create Routes and React elements to be rendered using React components
   render() {  
