@@ -36,6 +36,17 @@ class App extends Component {
     this.setState({currentUser: newUser})
   }
 
+  addCredit = (creditForm) => {
+    let newCredit = this.state.creditList;
+    newCredit.push(creditForm);
+    // this.setState({accountBalance: this.state.accountBalance + creditForm.amount, creditList: newCredit});
+    let newBalance = 0;
+    newBalance = Math.round((this.state.accountBalance + parseFloat(creditForm.amount))* 100) / 100;
+    console.log(this.state.accountBalance)
+    console.log(creditForm.amount)
+    this.setState({accountBalance: newBalance, creditList: newCredit});
+  }
+
   async componentDidMount() {
     let creditAPI = 'https://johnnylaicode.github.io/api/credits.json';  // Link to remote website API endpoint
     let debitAPI = 'https://johnnylaicode.github.io/api/debits.json'
@@ -75,13 +86,15 @@ class App extends Component {
 
   // Create Routes and React elements to be rendered using React components
   render() {  
+
+
     // Create React elements and pass input props to components
     const HomeComponent = () => (<Home accountBalance={this.state.accountBalance} />)
     const UserProfileComponent = () => (
       <UserProfile userName={this.state.currentUser.userName} memberSince={this.state.currentUser.memberSince} />
     )
     const LogInComponent = () => (<LogIn user={this.state.currentUser} mockLogIn={this.mockLogIn} />)
-    const CreditsComponent = () => (<Credits credits={this.state.creditList} />) 
+    const CreditsComponent = () => (<Credits addCredit={this.addCredit} credits={this.state.creditList} accountBalance={this.state.accountBalance}/>) 
     const DebitsComponent = () => (<Debits debits={this.state.debitList} />) 
 
     // Important: Include the "basename" in Router, which is needed for deploying the React app to GitHub Pages
