@@ -14,6 +14,7 @@ import UserProfile from './components/UserProfile';
 import LogIn from './components/Login';
 import Credits from './components/Credits';
 import Debits from './components/Debits';
+import AccountBalance from './components/AccountBalance';
 
 class App extends Component {
   constructor() {  // Create and initialize state
@@ -34,6 +35,14 @@ class App extends Component {
     const newUser = {...this.state.currentUser};
     newUser.userName = logInInfo.userName;
     this.setState({currentUser: newUser})
+  }
+
+  addDebit = (debitForm) => {
+    let newDebit = this.state.debitList;
+    newDebit.push(debitForm);
+    let newBalance = 0;
+    newBalance = Math.round((this.state.accountBalance - debitForm.amount)* 100) / 100;
+    this.setState({accountBalance: newBalance, debitList: newDebit});
   }
 
   async componentDidMount() {
@@ -62,6 +71,7 @@ class App extends Component {
       }
       let balance = 0;
       balance = Math.round((creditAmount - debitAmount) * 100) / 100;
+      balance = balance.toFixed(2);
       this.setState({accountBalance: balance, creditList: credit, debitList: debit});  // Store received data in state's "users" object
     } 
     catch (error) {  // Print out errors at console when there is an error response
@@ -82,7 +92,7 @@ class App extends Component {
     )
     const LogInComponent = () => (<LogIn user={this.state.currentUser} mockLogIn={this.mockLogIn} />)
     const CreditsComponent = () => (<Credits credits={this.state.creditList} />) 
-    const DebitsComponent = () => (<Debits debits={this.state.debitList} />) 
+    const DebitsComponent = () => (<Debits debits={this.state.debitList} addDebit={this.addDebit} accountBalance={this.state.accountBalance}/>) 
 
     // Important: Include the "basename" in Router, which is needed for deploying the React app to GitHub Pages
     return (
